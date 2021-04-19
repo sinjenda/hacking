@@ -1,9 +1,16 @@
 package computer;
 
-public class File extends Filesystem{
+import computer.program.logging.PermissionLevel;
+import computer.program.logging.User;
 
-    public File(String name) {
+public class File extends Filesystem{
+    public static User system=new User("System","", PermissionLevel.root);
+
+    User owner;
+
+    public File(String name,User owner) {
         super(name);
+        this.owner=owner;
     }
 
     @Override
