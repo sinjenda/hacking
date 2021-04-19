@@ -1,6 +1,11 @@
+package main;
+
+import computer.Computer;
 import computer.program.Program;
+import computer.program.logging.User;
 import me.tongfei.progressbar.ProgressBar;
 import me.tongfei.progressbar.ProgressBarStyle;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -8,28 +13,32 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 public class Terminal extends Program implements KeyListener {
     private JTextField textField1;
     private JLabel cs;
     private JPanel pan;
     private JTextPane textPane1;
+    String currentPath;
+    User logged;
+    Computer local;
 
-    public Terminal(String name) {
+    public Terminal(String name, User logged,Computer local) {
         super(name,system);
-        textPane1.setEditable(false);
-        textPane1.setBackground(Color.black);
-        pan.setBackground(Color.black);
-        cs.setForeground(Color.GREEN);
-        cs.setText("jan@vpc");
-        textField1.addKeyListener(this);
+        this.logged=logged;
+        this.local=local;
+    }
+    public Terminal(Terminal terminal){
+        this("", terminal.logged, terminal.local);
+
     }
 
     public ProgressBar createProgressBar(String task){
@@ -40,12 +49,19 @@ public class Terminal extends Program implements KeyListener {
         return Console.newInstance(textPane1);
     }
 
-    public void start() {
+    private void start() {
         JFrame frame = new JFrame();
         frame.setContentPane(pan);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setSize(500, 300);
         frame.setVisible(true);
+        textPane1.setEditable(false);
+        textPane1.setBackground(Color.black);
+        pan.setBackground(Color.black);
+        cs.setForeground(Color.GREEN);
+        cs.setText(logged.getName()+"@kali");
+        textField1.addKeyListener(this);
+        currentPath="/home/"+logged.getName()+"/";
     }
 
     @Override
@@ -61,6 +77,23 @@ public class Terminal extends Program implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode()==KeyEvent.VK_ENTER){
+            String comm=textField1.getText();
+            Objects.requireNonNull(scanForFile(comm)).exec();
+
+        }
+    }
+    private @Nullable Program scanForFile(String name) {
+        try {
+            return (Program) local.getRoot().getFile("/bin/"+name);
+
+        } catch (IOException e) {
+            try {
+                return (Program) local.getRoot().getFile("/usr/bin/"+name);
+            }
+            catch (IOException e1){
+                getWriter().println(e1.getMessage());
+                return null;
+            }
 
         }
     }
@@ -133,7 +166,7 @@ public class Terminal extends Program implements KeyListener {
     }
 
 
-    public static void main(String[] args) {
 
-    }
+
+
 }

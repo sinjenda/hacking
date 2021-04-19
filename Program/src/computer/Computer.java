@@ -6,4 +6,7 @@ public class Computer {
     public Computer(MotherBoard board) {
         this.board = board;
     }
+    public Folder getRoot(){
+        return board.disk.root;
+    }
 }

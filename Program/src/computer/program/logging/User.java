@@ -4,6 +4,7 @@ public class User {
     final String name;
     int password;
     final PermissionLevel level;
+    boolean accepted=false;
 
     public User(String name, String password, PermissionLevel level) {
         this.name = name;
@@ -18,5 +19,9 @@ public class User {
     }
     public boolean tryPassword(String password){
         return password.hashCode()==this.password;
+    }
+
+    public String getName() {
+        return name;
     }
 }
