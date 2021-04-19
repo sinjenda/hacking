@@ -11,7 +11,7 @@ public class Main {
         Computer c=new Computer(board);
         d.generateDefaultFiles(c);
         try {
-            ((Program)c.getRoot().getFile("/usr/bin/Terminal")).exec();
+            ((Program)c.getRoot().getFile("/usr/bin/Terminal")).exec(new String[]{},null);
         }
         catch (Exception e){
             e.printStackTrace();

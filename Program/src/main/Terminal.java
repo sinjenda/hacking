@@ -21,6 +21,7 @@ import java.io.PrintStream;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Terminal extends Program implements KeyListener {
     private JTextField textField1;
@@ -29,15 +30,14 @@ public class Terminal extends Program implements KeyListener {
     private JTextPane textPane1;
     String currentPath;
     User logged;
-    Computer local;
 
     public Terminal(String name, User logged,Computer local) {
-        super(name,system);
+        super(name,system,local);
         this.logged=logged;
-        this.local=local;
     }
+    @SuppressWarnings("CopyConstructorMissesField")
     public Terminal(Terminal terminal){
-        this("", terminal.logged, terminal.local);
+        this("", terminal.logged, terminal.c);
 
     }
 
@@ -78,17 +78,19 @@ public class Terminal extends Program implements KeyListener {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode()==KeyEvent.VK_ENTER){
             String comm=textField1.getText();
-            Objects.requireNonNull(scanForFile(comm)).exec();
+            Scanner scnr=new Scanner(comm);
+            String name=scnr.next();
+            Objects.requireNonNull(scanForFile(name)).exec(new String[]{currentPath,comm.replaceFirst(name+" ","")},this);
 
         }
     }
     private @Nullable Program scanForFile(String name) {
         try {
-            return (Program) local.getRoot().getFile("/bin/"+name);
+            return (Program) c.getRoot().getFile("/bin/"+name);
 
         } catch (IOException e) {
             try {
-                return (Program) local.getRoot().getFile("/usr/bin/"+name);
+                return (Program) c.getRoot().getFile("/usr/bin/"+name);
             }
             catch (IOException e1){
                 getWriter().println(e1.getMessage());
@@ -103,7 +105,7 @@ public class Terminal extends Program implements KeyListener {
 
     }
 
-    private static class Console extends PrintStream {
+    public static class Console extends PrintStream {
         int i = 0;
         ConsoleWriter writer;
 

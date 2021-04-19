@@ -2,6 +2,7 @@ package computer;
 
 import computer.program.logging.Passwd;
 import computer.program.logging.PermissionLevel;
+import computer.program.logging.ProgramFiles.Ls;
 import computer.program.logging.User;
 import main.Terminal;
 
@@ -34,9 +35,14 @@ public class Disk {
         createDefaultUsers(p);
         usrBin.addFile(new Terminal("Terminal", Objects.requireNonNull(p.login("guest", "")),c));
 
+
+
     }
     public void createDefaultUsers(Passwd p){
         p.addUser(new User("guest","", PermissionLevel.guest),root);
         p.addUser(new User("root", p.generatePassword(), PermissionLevel.root),root);
+    }
+    public void createBinFiles(Folder bin,Computer c){
+        bin.addFile(new Ls(c));
     }
 }

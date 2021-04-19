@@ -1,5 +1,6 @@
 package computer.program;
 
+import computer.Computer;
 import computer.File;
 import computer.program.logging.User;
 import main.Terminal;
@@ -10,23 +11,26 @@ import java.util.concurrent.ThreadLocalRandom;
 public abstract class Program extends File implements Runnable {
     ArrayList<Port> openPorts = new ArrayList<>();
 
-    public Program(String name, User owner) {
+    protected Computer c;
+
+    public Program(String name, User owner,Computer c) {
         super(name, owner);
+        this.c=c;
     }
 
     public void addPort(int num) {
         openPorts.add(new Port(num));
     }
 
-    public void exec() {
-        Thread t;
+    public void exec(String[] params,Terminal t) {
+        Thread t1;
         if (this instanceof Terminal){
-            t=new Thread(new Terminal((Terminal) this));
+            t1=new Thread(new Terminal((Terminal) this));
         }
         else
-            t = new Thread(this);
+            t1 = new Thread(this);
 
-        t.start();
+        t1.start();
     }
 
     @Override
