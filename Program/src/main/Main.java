@@ -13,7 +13,6 @@ public class Main {
         try {
             Terminal t=((Terminal)c.getRoot().getFile("/usr/bin/Terminal"));
             t.exec(new String[]{},null);
-            t.getWriter().println("started");
         }
         catch (Exception e){
             e.printStackTrace();

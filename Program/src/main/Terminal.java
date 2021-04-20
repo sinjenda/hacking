@@ -36,7 +36,7 @@ public class Terminal extends Program implements KeyListener {
         super(name,system,local);
         this.logged=logged;
     }
-    public Console newConsole(JTextPane area) {
+    private Console newConsole(JTextPane area) {
         return new Console(new ConsoleWriter(area));
     }
     @SuppressWarnings("CopyConstructorMissesField")
@@ -45,8 +45,8 @@ public class Terminal extends Program implements KeyListener {
 
     }
 
-    public ProgressBar createProgressBar(String task){
-        return new ProgressBar(task, 100, 1000, getWriter(), ProgressBarStyle.COLORFUL_UNICODE_BLOCK, "", 1L, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
+    public static ProgressBar createProgressBar(String task,Console writer){
+        return new ProgressBar(task, 100, 1000, writer, ProgressBarStyle.COLORFUL_UNICODE_BLOCK, "", 1L, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
     }
 
     public Console getWriter() {
@@ -94,11 +94,23 @@ public class Terminal extends Program implements KeyListener {
                     else {
                         currentPath+=param+"/";
                     }
+                case "pwd":
+                    getWriter().println(currentPath);
                 default:
                     Objects.requireNonNull(scanForFile(name)).exec(new String[]{currentPath, comm.replaceFirst(name + " ", "")}, this);
             }
         }
     }
+
+    public static String pathBuilder(String currentPath,String name){
+        if (name.startsWith("/")){
+            return name;
+        }
+        else {
+            return currentPath+=name;
+        }
+    }
+
     private @Nullable Program scanForFile(String name) {
         try {
             return (Program) c.getRoot().getFile("/bin/"+name);
