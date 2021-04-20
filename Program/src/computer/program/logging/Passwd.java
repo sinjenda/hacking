@@ -24,10 +24,10 @@ public class Passwd extends File {
         super("passwd",system);
     }
 
-    public String generatePassword(){
+    public static String generatePassword(){
         ArrayList<String>passwords=new ArrayList<>();
         try {
-            Scanner scnr=new Scanner(new java.io.File(Objects.requireNonNull(getClass().getResource("/computer/program/logging/passwords")).getFile()));
+            Scanner scnr=new Scanner(new java.io.File(Objects.requireNonNull(Passwd.class.getResource("/computer/program/logging/passwords")).getFile()));
             while (scnr.hasNext()){
                 passwords.add(scnr.next());
             }
@@ -36,6 +36,20 @@ public class Passwd extends File {
         }
         return passwords.get(ThreadLocalRandom.current().nextInt(0,passwords.size()));
     }
+
+    public static String generateUserName(){
+        ArrayList<String>passwords=new ArrayList<>();
+        try {
+            Scanner scnr=new Scanner(new java.io.File(Objects.requireNonNull(Passwd.class.getResource("/computer/program/logging/usernames")).getFile()));
+            while (scnr.hasNext()){
+                passwords.add(scnr.next());
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return passwords.get(ThreadLocalRandom.current().nextInt(0,passwords.size()));
+    }
+
     public void addUser(User user, Folder root){
         user.accepted=true;
         try {

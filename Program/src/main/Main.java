@@ -2,7 +2,6 @@ package main;
 
 import computer.*;
 import computer.program.Program;
-import computer.program.logging.Passwd;
 
 public class Main {
     public static void main(String[] args) {
@@ -10,8 +9,11 @@ public class Main {
         MotherBoard board=new MotherBoard(new Cpu(15),new Ram(80),d);
         Computer c=new Computer(board);
         d.generateDefaultFiles(c);
+        d.createBinFiles(c.getRoot(), c);
         try {
-            ((Program)c.getRoot().getFile("/usr/bin/Terminal")).exec(new String[]{},null);
+            Terminal t=((Terminal)c.getRoot().getFile("/usr/bin/Terminal"));
+            t.exec(new String[]{},null);
+            t.getWriter().println("started");
         }
         catch (Exception e){
             e.printStackTrace();

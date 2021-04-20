@@ -30,10 +30,14 @@ public class Terminal extends Program implements KeyListener {
     private JTextPane textPane1;
     String currentPath;
     User logged;
+    int i=0;
 
     public Terminal(String name, User logged,Computer local) {
         super(name,system,local);
         this.logged=logged;
+    }
+    public Console newConsole(JTextPane area) {
+        return new Console(new ConsoleWriter(area));
     }
     @SuppressWarnings("CopyConstructorMissesField")
     public Terminal(Terminal terminal){
@@ -46,7 +50,7 @@ public class Terminal extends Program implements KeyListener {
     }
 
     public Console getWriter() {
-        return Console.newInstance(textPane1);
+        return newConsole(textPane1);
     }
 
     private void start() {
@@ -79,9 +83,21 @@ public class Terminal extends Program implements KeyListener {
         if (e.getKeyCode()==KeyEvent.VK_ENTER){
             String comm=textField1.getText();
             Scanner scnr=new Scanner(comm);
-            String name=scnr.next();
-            Objects.requireNonNull(scanForFile(name)).exec(new String[]{currentPath,comm.replaceFirst(name+" ","")},this);
-
+            String name = scnr.next();
+            switch (name){
+                case "cd":
+                    comm=comm.replaceFirst(name+" ","");
+                    scnr=new Scanner(comm);
+                    String param=scnr.next();
+                    if (param.startsWith("/")){
+                        currentPath=param;
+                    }
+                    else {
+                        currentPath+=param+"/";
+                    }
+                default:
+                    Objects.requireNonNull(scanForFile(name)).exec(new String[]{currentPath, comm.replaceFirst(name + " ", "")}, this);
+            }
         }
     }
     private @Nullable Program scanForFile(String name) {
@@ -105,8 +121,7 @@ public class Terminal extends Program implements KeyListener {
 
     }
 
-    public static class Console extends PrintStream {
-        int i = 0;
+    public class Console extends PrintStream {
         ConsoleWriter writer;
 
 
@@ -118,25 +133,20 @@ public class Terminal extends Program implements KeyListener {
 
         @Override
         public final void println(String s) {
-            super.println();
             if (i == 16) {
-                String[] root = writer.area.getText().split(System.lineSeparator());
                 i = 0;
                 writer.area.setText("");
-                for (int i1 = 1; i1 != root.length; i1++) {
-                    println(root[i1]);
-                }
-            } else
+            } else {
                 i++;
+                super.println(s);
+            }
         }
 
-        public static Console newInstance(JTextPane area) {
-            return new Console(new ConsoleWriter(area));
-        }
+
 
     }
 
-    private static class ConsoleWriter extends OutputStream {
+    public static class ConsoleWriter extends OutputStream {
         JTextPane area;
 
 
@@ -164,6 +174,10 @@ public class Terminal extends Program implements KeyListener {
             area.replaceSelection(msg);
             area.setEditable(false);
         }
+
+    }
+
+    public static void main(String[] args) {
 
     }
 

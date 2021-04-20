@@ -6,6 +6,7 @@ import computer.program.logging.ProgramFiles.Ls;
 import computer.program.logging.User;
 import main.Terminal;
 
+import java.io.IOException;
 import java.util.Objects;
 
 
@@ -40,9 +41,13 @@ public class Disk {
     }
     public void createDefaultUsers(Passwd p){
         p.addUser(new User("guest","", PermissionLevel.guest),root);
-        p.addUser(new User("root", p.generatePassword(), PermissionLevel.root),root);
+        p.addUser(new User("root", Passwd.generatePassword(), PermissionLevel.root),root);
     }
-    public void createBinFiles(Folder bin,Computer c){
-        bin.addFile(new Ls(c));
+    public void createBinFiles(Folder root,Computer c){
+        try {
+            root.getFolder("/bin").addFile(new Ls(c));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
