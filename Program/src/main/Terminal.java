@@ -75,7 +75,6 @@ public class Terminal extends Program implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
-
     }
 
     @Override
@@ -118,7 +117,6 @@ public class Terminal extends Program implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
-
     }
 
     public class Console extends PrintStream {
