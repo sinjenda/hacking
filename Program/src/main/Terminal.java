@@ -29,7 +29,12 @@ public class Terminal extends Program implements KeyListener {
     private JPanel pan;
     private JTextPane textPane1;
     String currentPath;
-    User logged;
+
+    public User getLogged() {
+        return logged;
+    }
+
+    final User logged;
     int i=0;
 
     public Terminal(String name, User logged,Computer local) {
@@ -102,7 +107,8 @@ public class Terminal extends Program implements KeyListener {
         }
     }
 
-    public static String pathBuilder(String currentPath,String name){
+    @SuppressWarnings({"unused", "UnusedAssignment"})
+    public static String pathBuilder(String currentPath, String name){
         if (name.startsWith("/")){
             return name;
         }
@@ -132,7 +138,7 @@ public class Terminal extends Program implements KeyListener {
     }
 
     public class Console extends PrintStream {
-        ConsoleWriter writer;
+        final ConsoleWriter writer;
 
 
         private Console(ConsoleWriter stream) {
@@ -157,7 +163,7 @@ public class Terminal extends Program implements KeyListener {
     }
 
     public static class ConsoleWriter extends OutputStream {
-        JTextPane area;
+        final JTextPane area;
 
 
         @Override
@@ -172,14 +178,14 @@ public class Terminal extends Program implements KeyListener {
 
         private void append(String msg) {
             StyleContext sc = StyleContext.getDefaultStyleContext();
-            AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.GREEN);
+            AttributeSet asset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, Color.GREEN);
 
-            aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
-            aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+            asset = sc.addAttribute(asset, StyleConstants.FontFamily, "Lucida Console");
+            asset = sc.addAttribute(asset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 
             int len = area.getDocument().getLength();
             area.setCaretPosition(len);
-            area.setCharacterAttributes(aset, false);
+            area.setCharacterAttributes(asset, false);
             area.setEditable(true);
             area.replaceSelection(msg);
             area.setEditable(false);
@@ -187,9 +193,7 @@ public class Terminal extends Program implements KeyListener {
 
     }
 
-    public static void main(String[] args) {
 
-    }
 
 
 

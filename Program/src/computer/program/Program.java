@@ -2,24 +2,20 @@ package computer.program;
 
 import computer.Computer;
 import computer.File;
+import computer.Filesystem;
+import computer.program.logging.PermissionLevel;
 import computer.program.logging.User;
 import main.Terminal;
 
-import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Program extends File implements Runnable {
-    ArrayList<Port> openPorts = new ArrayList<>();
 
-    protected Computer c;
+    protected final Computer c;
 
     public Program(String name, User owner,Computer c) {
         super(name, owner);
         this.c=c;
-    }
-
-    public void addPort(int num) {
-        openPorts.add(new Port(num));
     }
 
     public void exec(String[] params,Terminal t) {
@@ -40,6 +36,10 @@ public abstract class Program extends File implements Runnable {
             ret.append(ThreadLocalRandom.current().nextInt(0, 9));
         }
         return ret.toString();
+    }
+
+    public boolean isAllowed(User user, Filesystem file) {
+        return !user.getLevel().equals(PermissionLevel.root) || !file.getOwner().getLevel().equals(PermissionLevel.guest) || user.equals(file.getOwner())||(file.getOwner().equals(registered)&&user.getLevel().equals(PermissionLevel.registered));
     }
 
     @Override

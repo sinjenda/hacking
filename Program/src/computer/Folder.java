@@ -1,19 +1,13 @@
 package computer;
 
+import computer.program.logging.User;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class Folder extends Filesystem{
 
-    ArrayList<Filesystem> subFiles=new ArrayList<>();
-
-    @Override
-    public boolean isFile() {
-        return true;
-    }
-    public boolean isExecutable(){
-        return false;
-    }
+    final ArrayList<Filesystem> subFiles=new ArrayList<>();
 
     public ArrayList<Filesystem> getFilesInDirectory(){
         return subFiles;
@@ -43,9 +37,8 @@ public class Folder extends Filesystem{
         if (path.startsWith("/"))
             path=path.replaceFirst("/","");
         String[]files=path.split("/");
-        ArrayList<Filesystem> current=subFiles;
         for (String s:files){
-            for (Filesystem sys:current){
+            for (Filesystem sys: subFiles){
                 if (sys.name.equals(s)){
                     return (Folder) sys;
                 }
@@ -54,11 +47,11 @@ public class Folder extends Filesystem{
         throw new IOException("file not found");
     }
 
-    public Folder(String name) {
-        super(name);
+    public Folder(String name, User owner) {
+        super(name, owner);
     }
-    public Folder createFolder(String name){
-        Folder f=new Folder(name);
+    public Folder createFolder(String name,User owner){
+        Folder f=new Folder(name,owner);
         subFiles.add(f);
         return f;
     }

@@ -11,20 +11,19 @@ import java.util.Objects;
 
 
 public class Disk {
-    Folder root=new Folder("/");
+    final Folder root=new Folder("/",File.system);
 
     public Disk() {
 
     }
     public void generateDefaultFiles(Computer c){
-        User u=File.system;
-        root.createFolder("root");
+        root.createFolder("root",Filesystem.system);
 
-        root.createFolder("etc").addFile(new Passwd());
+        root.createFolder("etc",Filesystem.system).addFile(new Passwd());
 
 
-        root.createFolder("bin");
-        Folder usrBin= root.createFolder("usr").createFolder("bin");
+        root.createFolder("bin",Filesystem.system);
+        Folder usrBin= root.createFolder("usr",Filesystem.system).createFolder("bin",Filesystem.system);
         Passwd p;
         try {
             p=((Passwd)root.getFile("/etc/passwd"));
@@ -32,7 +31,7 @@ public class Disk {
         catch (Exception e){
             throw new RuntimeException(e);
         }
-        root.createFolder("home");
+        root.createFolder("home",Filesystem.system);
         createDefaultUsers(p);
         usrBin.addFile(new Terminal("Terminal", Objects.requireNonNull(p.login("guest", "")),c));
 

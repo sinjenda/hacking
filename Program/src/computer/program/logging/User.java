@@ -8,6 +8,11 @@ public class User {
     }
 
     String password;
+
+    public PermissionLevel getLevel() {
+        return level;
+    }
+
     final PermissionLevel level;
     boolean accepted=false;
 
@@ -33,5 +38,13 @@ public class User {
     @Override
     public String toString() {
         return String.valueOf(password.hashCode());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            return ((User) obj).name.equals(name);
+        }
+        return false;
     }
 }

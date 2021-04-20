@@ -1,14 +1,5 @@
 package computer;
 
-public class MotherBoard {
-    Cpu cpu;
-    Ram ram;
+public record MotherBoard(Cpu cpu, Ram ram, Disk disk) {
 
-    public MotherBoard(Cpu cpu, Ram ram, Disk disk) {
-        this.cpu = cpu;
-        this.ram = ram;
-        this.disk = disk;
-    }
-
-    Disk disk;
 }

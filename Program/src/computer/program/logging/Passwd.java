@@ -14,7 +14,7 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Passwd extends File {
-    ArrayList<User>users=new ArrayList<>();
+    final ArrayList<User>users=new ArrayList<>();
 
     public ArrayList<User> getUsers() {
         return users;
@@ -28,8 +28,8 @@ public class Passwd extends File {
         ArrayList<String>passwords=new ArrayList<>();
         try {
             Scanner scnr=new Scanner(new java.io.File(Objects.requireNonNull(Passwd.class.getResource("/computer/program/logging/passwords")).getFile()));
-            while (scnr.hasNext()){
-                passwords.add(scnr.next());
+            while (scnr.hasNextLine()){
+                passwords.add(scnr.nextLine());
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -41,8 +41,8 @@ public class Passwd extends File {
         ArrayList<String>passwords=new ArrayList<>();
         try {
             Scanner scnr=new Scanner(new java.io.File(Objects.requireNonNull(Passwd.class.getResource("/computer/program/logging/usernames")).getFile()));
-            while (scnr.hasNext()){
-                passwords.add(scnr.next());
+            while (scnr.hasNextLine()){
+                passwords.add(scnr.nextLine());
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -53,7 +53,7 @@ public class Passwd extends File {
     public void addUser(User user, Folder root){
         user.accepted=true;
         try {
-            root.getFolder("/home").createFolder(user.getName());
+            root.getFolder("/home").createFolder(user.getName(),registered);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -61,10 +61,12 @@ public class Passwd extends File {
     }
     public @Nullable User login(String name, String password){
         User u= (User) users.stream().filter(a->a.name.equals(name)).toArray()[0];
-        if (u.tryPassword(password)){
-            return u;
+        if (u.accepted) {
+            if (u.tryPassword(password)) {
+                return u;
+            }
         }
-        else return null;
+        return null;
     }
 
     @Override
