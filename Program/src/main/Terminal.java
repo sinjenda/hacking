@@ -18,12 +18,12 @@ import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.Objects;
 import java.util.Scanner;
 
-public class Terminal extends Program implements KeyListener {
+public class Terminal extends Program implements KeyListener, Serializable {
     private JTextField textField1;
     private JLabel cs;
     private JPanel pan;
@@ -35,22 +35,23 @@ public class Terminal extends Program implements KeyListener {
     }
 
     final User logged;
-    int i=0;
 
-    public Terminal(String name, User logged,Computer local) {
-        super(name,system,local);
-        this.logged=logged;
+    public Terminal(String name, User logged, Computer local) {
+        super(name, system, local);
+        this.logged = logged;
     }
+
     private Console newConsole(JTextPane area) {
         return new Console(new ConsoleWriter(area));
     }
+
     @SuppressWarnings("CopyConstructorMissesField")
-    public Terminal(Terminal terminal){
+    public Terminal(Terminal terminal) {
         this("", terminal.logged, terminal.c);
 
     }
 
-    public static ProgressBar createProgressBar(String task,Console writer){
+    public static ProgressBar createProgressBar(String task, Console writer) {
         return new ProgressBar(task, 100, 1000, writer, ProgressBarStyle.COLORFUL_UNICODE_BLOCK, "", 1L, false, null, ChronoUnit.SECONDS, 0L, Duration.ZERO);
     }
 
@@ -68,9 +69,9 @@ public class Terminal extends Program implements KeyListener {
         textPane1.setBackground(Color.black);
         pan.setBackground(Color.black);
         cs.setForeground(Color.GREEN);
-        cs.setText(logged.getName()+"@kali");
+        cs.setText(logged.getName() + "@kali");
         textField1.addKeyListener(this);
-        currentPath="/home/"+logged.getName()+"/";
+        currentPath = "/home/" + logged.getName() + "/";
     }
 
     @Override
@@ -84,48 +85,49 @@ public class Terminal extends Program implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode()==KeyEvent.VK_ENTER){
-            String comm=textField1.getText();
-            Scanner scnr=new Scanner(comm);
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            String comm = textField1.getText();
+            Scanner scnr = new Scanner(comm);
             String name = scnr.next();
-            switch (name){
+            switch (name) {
                 case "cd":
-                    comm=comm.replaceFirst(name+" ","");
-                    scnr=new Scanner(comm);
-                    String param=scnr.next();
-                    if (param.startsWith("/")){
-                        currentPath=param;
-                    }
-                    else {
-                        currentPath+=param+"/";
+                    comm = comm.replaceFirst(name + " ", "");
+                    scnr = new Scanner(comm);
+                    String param = scnr.next();
+                    if (param.startsWith("/")) {
+                        currentPath = param;
+                    } else {
+                        currentPath += param + "/";
                     }
                 case "pwd":
                     getWriter().println(currentPath);
                 default:
-                    Objects.requireNonNull(scanForFile(name)).exec(new String[]{currentPath, comm.replaceFirst(name + " ", "")}, this);
+                    Program f = scanForFile(name);
+                    assert f != null;
+                    if (f.isAllowed(getLogged())) {
+                        f.exec(new String[]{currentPath, comm.replaceFirst(name + " ", "")}, this);
+                    }
             }
         }
     }
 
     @SuppressWarnings({"unused", "UnusedAssignment"})
-    public static String pathBuilder(String currentPath, String name){
-        if (name.startsWith("/")){
+    public static String pathBuilder(String currentPath, String name) {
+        if (name.startsWith("/")) {
             return name;
-        }
-        else {
-            return currentPath+=name;
+        } else {
+            return currentPath += name;
         }
     }
 
     private @Nullable Program scanForFile(String name) {
         try {
-            return (Program) c.getRoot().getFile("/bin/"+name);
+            return (Program) c.getRoot().getFile("/bin/" + name);
 
         } catch (IOException e) {
             try {
-                return (Program) c.getRoot().getFile("/usr/bin/"+name);
-            }
-            catch (IOException e1){
+                return (Program) c.getRoot().getFile("/usr/bin/" + name);
+            } catch (IOException e1) {
                 getWriter().println(e1.getMessage());
                 return null;
             }
@@ -137,7 +139,7 @@ public class Terminal extends Program implements KeyListener {
     public void keyReleased(KeyEvent e) {
     }
 
-    public class Console extends PrintStream {
+    public static class Console extends PrintStream {
         final ConsoleWriter writer;
 
 
@@ -145,19 +147,6 @@ public class Terminal extends Program implements KeyListener {
             super(stream);
             writer = stream;
         }
-
-
-        @Override
-        public final void println(String s) {
-            if (i == 16) {
-                i = 0;
-                writer.area.setText("");
-            } else {
-                i++;
-                super.println(s);
-            }
-        }
-
 
 
     }
@@ -168,7 +157,7 @@ public class Terminal extends Program implements KeyListener {
 
         @Override
         public void write(int b) {
-
+            System.out.println("written to console: " + area);
             append(String.valueOf((char) b));
         }
 
@@ -192,11 +181,6 @@ public class Terminal extends Program implements KeyListener {
         }
 
     }
-
-
-
-
-
 
 
 }

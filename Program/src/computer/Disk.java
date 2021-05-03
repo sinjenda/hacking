@@ -2,7 +2,7 @@ package computer;
 
 import computer.program.logging.Passwd;
 import computer.program.logging.PermissionLevel;
-import computer.program.logging.ProgramFiles.Ls;
+import computer.program.logging.programFiles.Ls;
 import computer.program.logging.User;
 import main.Terminal;
 

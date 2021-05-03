@@ -20,13 +20,16 @@ public abstract class Program extends File implements Runnable {
 
     public void exec(String[] params,Terminal t) {
         Thread t1;
+        Terminal t2 = null;
         if (this instanceof Terminal){
-            t1=new Thread(new Terminal((Terminal) this));
+            t2=new Terminal((Terminal) this);
+            t1=new Thread(t2);
         }
         else
             t1 = new Thread(this);
 
         t1.start();
+        System.out.println(t2);
     }
 
     @Override
@@ -38,9 +41,7 @@ public abstract class Program extends File implements Runnable {
         return ret.toString();
     }
 
-    public boolean isAllowed(User user, Filesystem file) {
-        return !user.getLevel().equals(PermissionLevel.root) || !file.getOwner().getLevel().equals(PermissionLevel.guest) || user.equals(file.getOwner())||(file.getOwner().equals(registered)&&user.getLevel().equals(PermissionLevel.registered));
-    }
+
 
     @Override
     public abstract void run();
