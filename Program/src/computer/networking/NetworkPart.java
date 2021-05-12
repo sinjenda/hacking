@@ -2,12 +2,13 @@ package computer.networking;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class NetworkPart {
-    final String ip = generateIp();
+    protected final String ip = generateIp();
     private final ArrayList<NetworkPart> below = new ArrayList<>();
 
     private NetworkPart getBehind() {
@@ -20,17 +21,29 @@ public abstract class NetworkPart {
             behind.addBelow(this);
     }
 
-    public abstract String getIp();
+    public String getIp() {
+        return ip;
+    }
+
+    public boolean processPacket(Packet packet) {
+        return false;
+    }
 
 
-    public final void sendPacketUp(Packet packet, String destIp) {
+    public final void sendPacket(Packet packet) throws RuntimeException{
         if (getBehind() == Router.ethernet) {
-            Objects.requireNonNull(Objects.requireNonNull(getBehind().getBelow(destIp)).listenerAt(packet.port().number())).process(packet);
+            try {
+                Objects.requireNonNull(Objects.requireNonNull(getBehind().sendPacketBelow(packet)).listenerAt(packet.port().number())).process(packet);
+            }
+            catch (SocketException e){
+                throw new RuntimeException(e);
+            }
         } else {
-            getBehind().sendPacketUp(packet, destIp);
+            getBehind().sendPacket(packet);
         }
     }
 
+    @SuppressWarnings("unused")
     public @Nullable NetworkPart getBelow(String ip) {
         ArrayList<Router> routers = new ArrayList<>();
         for (NetworkPart part : below) {
@@ -48,7 +61,29 @@ public abstract class NetworkPart {
         return null;
     }
 
+    protected final NetworkPart sendPacketBelow(Packet packet) throws SocketException {
+        ArrayList<Router> routers = new ArrayList<>();
+        for (NetworkPart part : below) {
+            if (part.processPacket(packet)){
+                throw new SocketException("address not reachable");
+            }
+            if (part.getIp().equals(packet.port().dest())) {
+                return part;
+            }
+            if (part instanceof Router) {
+                routers.add((Router) part);
+            }
+        }
+        for (Router r : routers) {
+            try {
+                return r.sendPacketBelow(packet);
+            }catch (SocketException e){
+                e.printStackTrace();
+            }
 
+        }
+        throw new SocketException("address not reachable");
+    }
 
 
     private void addBelow(NetworkPart part) {
@@ -76,13 +111,6 @@ public abstract class NetworkPart {
         public Ethernet() {
             super(null);
         }
-
-        @Override
-        public String getIp() {
-            return ip;
-        }
-
-
 
 
         @Override

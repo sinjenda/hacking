@@ -2,7 +2,6 @@ package computer;
 
 import computer.program.logging.Passwd;
 import computer.program.logging.PermissionLevel;
-import computer.program.logging.programFiles.Ls;
 import computer.program.logging.User;
 import main.Terminal;
 
@@ -44,7 +43,8 @@ public class Disk {
     }
     public void createBinFiles(Folder root,Computer c){
         try {
-            root.getFolder("/bin").addFile(new Ls(c));
+            Folder bin=root.getFolder("/bin");
+            DefaultBinFiles.getPrograms().forEach(bin::addFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

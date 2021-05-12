@@ -37,7 +37,7 @@ public class Terminal extends Program implements KeyListener, Serializable {
     final User logged;
 
     public Terminal(String name, User logged, Computer local) {
-        super(name, system, local);
+        super(name, system, local,false);
         this.logged = logged;
     }
 

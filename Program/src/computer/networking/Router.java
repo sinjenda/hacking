@@ -3,32 +3,68 @@ package computer.networking;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.Objects;
 
-public class Router extends NetworkPart {
-    private final String ip = NetworkPart.generateIp();
+public class Router extends NetworkPart implements NetListener {
 
-    private final HashMap<Integer, Port> redirecting = new HashMap<>();
-    public static NetworkPart ethernet = new Ethernet();
+    private final HashMap<String, Port> redirecting = new HashMap<>();
+    public static final NetworkPart ethernet = new Ethernet();
 
     public Router(NetworkPart behind) {
         super(behind);
+        addRedirect("all", new Port(8080, getIp()));
     }
-
-    public void addRedirect(int source, Port target) {
-        redirecting.put(source, target);
-    }
-
-
 
     @Override
-    public String getIp() {
-        return ip;
+    public boolean processPacket(Packet packet) {
+        if (redirecting.containsKey(packet.source()) && redirecting.get(packet.port().dest()).equals(packet.port())) {
+            return super.processPacket(packet);
+        }
+        if (redirecting.get("all").equals(packet.port())) {
+            return super.processPacket(packet);
+        }
+        return true;
+    }
+
+    public void addRedirect(String source, Port target) {
+        redirecting.put(source, target);
     }
 
 
     @Override
     public @Nullable NetListener listenerAt(int port) {
+        if (port == 8080) {
+            return this;
+        }
         return null;
     }
+
+    boolean active = false;
+
+    @Override
+    public boolean active() {
+        return active;
+    }
+
+    @Override
+    public void process(Packet p) {
+        try {
+            if (!active) {
+                active = true;
+                switch (p.input().readUTF()) {
+                    case "remove":
+                        redirecting.clear();
+                        addRedirect("all", new Port(8080, getIp()));
+                    case "add":
+                        addRedirect(p.input().readUTF(), new Port(p.input().read(), p.input().readUTF()));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 }
+
+

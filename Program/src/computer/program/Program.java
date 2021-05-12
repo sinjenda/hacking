@@ -1,9 +1,8 @@
 package computer.program;
 
 import computer.Computer;
+import computer.DefaultBinFiles;
 import computer.File;
-import computer.Filesystem;
-import computer.program.logging.PermissionLevel;
 import computer.program.logging.User;
 import main.Terminal;
 
@@ -13,9 +12,16 @@ public abstract class Program extends File implements Runnable {
 
     protected final Computer c;
 
-    public Program(String name, User owner,Computer c) {
+    public Program(String name, User owner,Computer c,boolean isDefault) {
         super(name, owner);
+        if (isDefault){
+            DefaultBinFiles.add(this);
+        }
         this.c=c;
+    }
+
+    public Program(String name, User owner, Computer c) {
+        this(name,owner,c,false);
     }
 
     public void exec(String[] params,Terminal t) {

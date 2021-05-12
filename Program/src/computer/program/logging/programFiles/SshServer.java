@@ -15,7 +15,7 @@ public class SshServer extends Program implements NetListener {
     boolean active = true;
 
     public SshServer(Computer computer, User owner) {
-        super("ssh-server", owner, computer);
+        super("ssh-server", owner, computer,false);
     }
 
     @Override
@@ -59,11 +59,6 @@ public class SshServer extends Program implements NetListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public int port() {
-        return 22;
     }
 
     @Override
