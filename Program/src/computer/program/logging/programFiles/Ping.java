@@ -6,14 +6,14 @@ import computer.networking.Port;
 import computer.program.Program;
 import main.Terminal;
 
-import java.io.*;
+import java.util.Objects;
 
 public class Ping extends Program {
     Terminal t;
     String[] params;
 
     public Ping(Computer c) {
-        super("ping", system, c,true);
+        super("ping", c);
     }
 
     @Override
@@ -26,15 +26,10 @@ public class Ping extends Program {
     @Override
     public void run() {
         try {
-            PipedOutputStream pos=new PipedOutputStream();
-            ObjectOutputStream oos=new ObjectOutputStream(pos);
-            ObjectInputStream ois=new ObjectInputStream(new PipedInputStream(pos));
-            c.sendPacket(new Packet(ois,oos,new Port(0,params[1]),c.getIp()));
+            Packet p=new Packet(new Port(0,params[1]),c.getIp(),null,null,null);
+            Objects.requireNonNull(c.sendPacket(p)).process(p);
             t.getWriter().println("reachable");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (RuntimeException e){
+        } catch (RuntimeException e){
             t.getWriter().println("not reachable");
         }
     }

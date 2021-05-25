@@ -48,14 +48,15 @@ public class Router extends NetworkPart implements NetListener {
     @Override
     public void process(Packet p) {
         try {
+            PacketHelper helper=new PacketHelper(p);
             if (!active) {
                 active = true;
-                switch (p.input().readUTF()) {
+                switch (helper.readCommand()) {
                     case "remove":
                         redirecting.clear();
                         addRedirect("all", new Port(8080, getIp()));
                     case "add":
-                        addRedirect(p.input().readUTF(), new Port(p.input().read(), p.input().readUTF()));
+                        addRedirect(helper.next(), new Port(helper.as(), helper.next()));
                 }
             }
         } catch (Exception e) {

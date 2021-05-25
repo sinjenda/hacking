@@ -14,7 +14,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Decipher extends Program {
     String name;
     Terminal.Console console;
-    final Computer c;
 
     @Override
     public void exec(String[] params, Terminal t) {
@@ -23,9 +22,8 @@ public class Decipher extends Program {
         super.exec(params, t);
     }
 
-    public Decipher( User owner, Computer c) {
-        super("decipher", owner, c);
-        this.c=c;
+    public Decipher(Computer c) {
+        super("decipher", c,10);
     }
 
     @SuppressWarnings("BusyWait")

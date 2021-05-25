@@ -30,10 +30,10 @@ public abstract class NetworkPart {
     }
 
 
-    public final void sendPacket(Packet packet) throws RuntimeException{
+    public final NetListener sendPacket(Packet packet) throws RuntimeException{
         if (getBehind() == Router.ethernet) {
             try {
-                Objects.requireNonNull(Objects.requireNonNull(getBehind().sendPacketBelow(packet)).listenerAt(packet.port().number())).process(packet);
+                return Objects.requireNonNull(Objects.requireNonNull(getBehind().sendPacketBelow(packet)).listenerAt(packet.port().number()));
             }
             catch (SocketException e){
                 throw new RuntimeException(e);
@@ -41,6 +41,7 @@ public abstract class NetworkPart {
         } else {
             getBehind().sendPacket(packet);
         }
+        return null;
     }
 
     @SuppressWarnings("unused")

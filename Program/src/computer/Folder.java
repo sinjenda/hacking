@@ -1,5 +1,6 @@
 package computer;
 
+import computer.program.Program;
 import computer.program.logging.User;
 
 import java.io.IOException;
@@ -14,7 +15,6 @@ public class Folder extends Filesystem{
     }
 
     public File getFile(String path) throws IOException {
-        //return (File) subFiles.stream().filter(a->a.name.equals(path)).toArray()[0];
         if (path.startsWith("/"))
             path=path.replaceFirst("/","");
         String[]files=path.split("/");
@@ -56,6 +56,8 @@ public class Folder extends Filesystem{
         return f;
     }
     public void addFile(File file){
+        if (file instanceof Program&& file.getOwner().equals(Program.shop))
+            return;
         subFiles.add(file);
     }
 

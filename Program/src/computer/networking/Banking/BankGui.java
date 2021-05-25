@@ -1,8 +1,11 @@
 package computer.networking.Banking;
 
+import computer.Computer;
+import computer.program.Program;
+
 import javax.swing.*;
 
-public class BankGui {
+public class BankGui{
     private JTextField usernameTextField;
     private JPasswordField passwordPasswordField;
     private JButton loginButton;
@@ -16,11 +19,10 @@ public class BankGui {
         JFrame frame = new JFrame();
         frame.setContentPane(panel);
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         frame.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        new BankGui();
-    }
+
 }

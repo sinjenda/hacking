@@ -1,8 +1,5 @@
 package computer.networking;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-public record Packet(ObjectInputStream input, ObjectOutputStream output,Port port,String source) {
+public record Packet(Port port,String source,Object[] data,String command,NetListener listener) {
 
 }

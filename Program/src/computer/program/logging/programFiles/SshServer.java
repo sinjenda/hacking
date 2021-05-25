@@ -5,17 +5,20 @@ import computer.Filesystem;
 import computer.Folder;
 import computer.networking.NetListener;
 import computer.networking.Packet;
+import computer.networking.PacketHelper;
+import computer.networking.ServiceHelper;
 import computer.program.Program;
-import computer.program.logging.User;
-import main.Terminal;
+import computer.program.logging.Passwd;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class SshServer extends Program implements NetListener {
     boolean active = true;
+    ServiceHelper service=new ServiceHelper();
 
-    public SshServer(Computer computer, User owner) {
-        super("ssh-server", owner, computer,false);
+    public SshServer(Computer computer) {
+        super("ssh-server", computer);
     }
 
     @Override
@@ -26,36 +29,44 @@ public class SshServer extends Program implements NetListener {
     @Override
     public void process(Packet p) {
         try {
-
+            PacketHelper iterator=new PacketHelper(p);
             if (active()) {
-                p.output().writeUTF("already in use");
+                p.listener().process(createPacket(new Object[]{"already in use"},"ret"));
             } else {
                 active = true;
-                switch (p.input().readUTF()) {
+                switch (p.command()) {
                     case "ls":
                         try {
                             Folder current;
-                            current = super.c.getRoot().getFolder(p.input().readUTF());
+                            current = c.getRoot().getFolder(iterator.next());
                             StringBuilder name = new StringBuilder();
                             for (Filesystem sys : current.getFilesInDirectory()) {
                                 name.append(sys.getName()).append(" ");
                             }
-                            p.output().writeUTF(name.toString());
+                            iterator.write(name.toString());
+                            iterator.writeCommand("ret");
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         break;
                     case "run":
                         try {
-                            ((Program) c.getRoot().getFile(p.input().readUTF())).exec((String[]) p.input().readObject(), (Terminal) p.input().readObject());
-                            p.output().writeUTF("done");
+                            ((Program) c.getRoot().getFile(iterator.next())).exec(iterator.as(), iterator.as());
+                            iterator.write("done");
                         } catch (IOException e) {
                             e.printStackTrace();
-                            p.output().writeUTF(e.getMessage() + " occurred");
+                            iterator.write(e.getMessage() + " occurred");
                         }
+                        iterator.writeCommand("ret");
+                    case "connect":
+                        UUID id=service.newConnection();
+                        service.authorize(id,((Passwd)c.getRoot().getFile("/etc/passwd")).login(iterator.next(),iterator.next()).getLevel());
+                        iterator.write(id);
+                        iterator.writeCommand("connect");
                 }
                 active = false;
             }
+            iterator.send(this,p.listener());
         } catch (Exception e) {
             e.printStackTrace();
         }

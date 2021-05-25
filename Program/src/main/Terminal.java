@@ -34,10 +34,14 @@ public class Terminal extends Program implements KeyListener, Serializable {
         return logged;
     }
 
-    final User logged;
+    public void setLogged(User logged) {
+        this.logged = logged;
+    }
 
-    public Terminal(String name, User logged, Computer local) {
-        super(name, system, local,false);
+    private User logged;
+
+    public Terminal(User logged, Computer local) {
+        super("Terminal", local);
         this.logged = logged;
     }
 
@@ -47,7 +51,7 @@ public class Terminal extends Program implements KeyListener, Serializable {
 
     @SuppressWarnings("CopyConstructorMissesField")
     public Terminal(Terminal terminal) {
-        this("", terminal.logged, terminal.c);
+        this(terminal.logged, terminal.c);
 
     }
 

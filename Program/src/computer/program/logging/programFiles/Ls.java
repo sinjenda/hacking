@@ -13,7 +13,7 @@ public class Ls extends Program {
     String[] params;
     Terminal.Console console;
     public Ls(Computer c) {
-        super("ls",system,c,true);
+        super("ls",c);
     }
 
     @Override

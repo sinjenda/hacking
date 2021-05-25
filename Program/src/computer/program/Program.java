@@ -1,27 +1,34 @@
 package computer.program;
 
 import computer.Computer;
-import computer.DefaultBinFiles;
+import computer.Game;
+import computer.ProgramRegistry;
 import computer.File;
+import computer.program.logging.PermissionLevel;
 import computer.program.logging.User;
 import main.Terminal;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class Program extends File implements Runnable {
-
+    public static final User shop=new User("shop","", PermissionLevel.root);
     protected final Computer c;
 
-    public Program(String name, User owner,Computer c,boolean isDefault) {
-        super(name, owner);
-        if (isDefault){
-            DefaultBinFiles.add(this);
-        }
+    public Program(String name,Computer c) {
+        super(name, system);
         this.c=c;
     }
 
-    public Program(String name, User owner, Computer c) {
-        this(name,owner,c,false);
+    @Override
+    public void buy(User user) {
+        owner=user;
+        super.buy(user);
+    }
+
+    public Program(String name, Computer c, int price) {
+        super(name,shop);
+        this.c=c;
+        enable(price,name);
     }
 
     public void exec(String[] params,Terminal t) {
